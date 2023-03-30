@@ -18,15 +18,15 @@ app.use(express.urlencoded({ extended: true }));
 // express.json is a method built into express that recognizes Request Object as JSON
 app.use(express.json());
 
-// middleware to access static files, such as stylesheet
+// middleware to access static files
 app.use(express.static('./develop/public'));
 
 // GET route to return notes.html
-app.get('api/notes', function(req, res) {
+app.get('/api/notes', function(req, res) {
     // readFileAsync reads the db.json file, then returns the data
-    readFileAsync('db/db.json', 'utf8').then(function(data) {
+    readFileAsync('./develop/db/db.json', 'utf8').then(function(data) {
         // parse the data, concat is used to convert the data into an array
-        notes = [].concat(JSON.parse(data));
+        notes = [].concat(JSON.parse(data))
         // return the notes array
         res.json(notes);
     })
@@ -35,21 +35,21 @@ app.get('api/notes', function(req, res) {
 // POST route to add new note to db.json
 app.post('/api/notes', function(req, res) {
     // newNote is the new note that will be added to the notes array that already exists in db.json
-    const newNote = req.body;
+    const note = req.body;
     // reads the db.json file, then returns the data
     readFileAsync('./develop/db/db.json', 'utf8').then(function(data) {
         // notes is the array that already exists in db.json
         // parse the data and concatentate it to the notes array
-        const notes = [].concat(JSON.parse(data));
+        const notes = [].concat(JSON.parse(data))
         // assign an id to the new note
-        newNote.id = notes.length + 1;
+        note.id = notes.length + 1;
         // push the new note to the notes array and return the notes array
-        notes.push(newNote);
+        notes.push(note);
         return notes
         // then write the new notes array to the db.json file
     }).then(function(notes) {
-        writeFileAsync('./develop/db/db.json', JSON.stringify(notes));
-        res.json(newNote);
+        writeFileAsync('./develop/db/db.json', JSON.stringify(notes))
+        res.json(note);
     })
 });
 
@@ -62,15 +62,15 @@ app.delete('/api/notes/:id', function(req, res) {
     readFileAsync('./develop/db/db.json', 'utf8').then(function(data) {
         // parse and concatenate the data to the notes array
         const notes = [].concat(JSON.parse(data));
-        const updatedNotes = []
+        const newNotesData = []
         // find all notes that we do not want to delete and push them to the newNotes array
         for (let i = 0; i < notes.length; i++) {
             if (deleteNote !== notes[i].id) {
-                updatedNotes.push(notes[i]);
+                newNotesData.push(notes[i])
             }
         }
         // return the updatedNotes array, then write the updatedNotes array to the db.json file
-        return updatedNotes;
+        return newNotesData;
     }).then(function(notes) {
         writeFileAsync('./develop/db/db.json', JSON.stringify(notes));
         res.send('Note deleted');
@@ -86,6 +86,8 @@ app.get('/notes', function(req, res) {
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, './develop/public/index.html'));
 });
+
+
 // the asterisk allows us to type anything into the URL and still return us to the homepage
 app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, './develop/public/index.html'));
@@ -93,6 +95,6 @@ app.get('*', function(req, res) {
 
 // listen on PORT
 app.listen(PORT, function() {
-    console.log(`app listening on PORT ${PORT}`);
+    console.log("App listening on PORT " + PORT);
 });
 
