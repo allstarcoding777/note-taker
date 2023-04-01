@@ -4,7 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const util = require('util');
 
-// read and write files asynchronously
+// read and write files asynchronously, asynchronicity allows us to do other things while the file is being read or written
+// promisify converts a function that takes a callback, to a function that returns a promise
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
@@ -35,21 +36,21 @@ app.get('/api/notes', function(req, res) {
 // POST route to add new note to db.json
 app.post('/api/notes', function(req, res) {
     // newNote is the new note that will be added to the notes array that already exists in db.json
-    const note = req.body;
+    const newNote = req.body;
     // reads the db.json file, then returns the data
     readFileAsync('./develop/db/db.json', 'utf8').then(function(data) {
         // notes is the array that already exists in db.json
         // parse the data and concatentate it to the notes array
         const notes = [].concat(JSON.parse(data))
         // assign an id to the new note
-        note.id = notes.length + 1;
+        newNote.id = notes.length + 1;
         // push the new note to the notes array and return the notes array
-        notes.push(note);
+        notes.push(newNote);
         return notes
-        // then write the new notes array to the db.json file
+        // then write the notes array to the db.json file
     }).then(function(notes) {
         writeFileAsync('./develop/db/db.json', JSON.stringify(notes))
-        res.json(note);
+        res.json(newNote);
     })
 });
 
@@ -62,15 +63,15 @@ app.delete('/api/notes/:id', function(req, res) {
     readFileAsync('./develop/db/db.json', 'utf8').then(function(data) {
         // parse and concatenate the data to the notes array
         const notes = [].concat(JSON.parse(data));
-        const newNotesData = []
+        const updatedNotes = []
         // find all notes that we do not want to delete and push them to the newNotes array
         for (let i = 0; i < notes.length; i++) {
             if (deleteNote !== notes[i].id) {
-                newNotesData.push(notes[i])
+                updatedNotes.push(notes[i])
             }
         }
         // return the updatedNotes array, then write the updatedNotes array to the db.json file
-        return newNotesData;
+        return updatedNotes;
     }).then(function(notes) {
         writeFileAsync('./develop/db/db.json', JSON.stringify(notes));
         res.send('Note deleted');
