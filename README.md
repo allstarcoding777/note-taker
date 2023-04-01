@@ -8,7 +8,7 @@
 
 ![webpage screenshot](develop/public/assets/images/webpage-screenshot.png)
 
-  * ## Github Repository URL
-  https://github.com/allstarcoding777/note-taker
+  ## Deployed Website
+  https://note-taker777.herokuapp.com/notes
   * ## License
   This project is licensed under the MIT license.
